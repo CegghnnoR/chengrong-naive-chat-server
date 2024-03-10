@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.chengrong.naive.chat.infrastructure.dao.IGroupsDao">
+
+    <select id="queryGroupsById" parameterType="java.lang.String" resultType="org.chengrong.naive.chat.infrastructure.po.Groups">
+        select groupId, groupName, groupHead
+        from `groups`
+        where groupId = #{groupId}
+    </select>
+
+</mapper>
