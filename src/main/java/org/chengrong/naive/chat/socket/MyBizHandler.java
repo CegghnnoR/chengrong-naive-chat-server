@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.chengrong.naive.chat.application.UserService;
+import org.chengrong.naive.chat.infrastructure.common.SocketChannelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,14 @@ public abstract class MyBizHandler<T> extends SimpleChannelInboundHandler<T> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+        SocketChannelUtil.removeChannel(ctx.channel().id().toString());
+        SocketChannelUtil.removeChannelGroupByChannel(ctx.channel());
+    }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.error("服务端异常断开", cause.getMessage());
+        SocketChannelUtil.removeChannel(ctx.channel().id().toString());
+        SocketChannelUtil.removeChannelGroupByChannel(ctx.channel());
     }
 }
