@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<TalkBoxInfo> queryTalkBoxInfoList(String userId) {
-        return null;
+        return userRepository.queryTalkBoxInfoList(userId);
     }
 
     @Override
@@ -38,12 +38,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserFriendInfo> queryUserFriendInfoList(String userId) {
-        return null;
+        return userRepository.queryUserFriendInfoList(userId);
     }
 
     @Override
-    public List<GroupsInfo> queryUserGroupsInfoList(String userId) {
-        return null;
+    public List<GroupsInfo> queryUserGroupInfoList(String userId) {
+        return userRepository.queryUserGroupInfoList(userId);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ChatRecordInfo> queryChatRecordInfoList(String talkId, String userId, Integer talkType) {
-        return null;
+        return userRepository.queryChatRecordInfoList(talkId, userId, talkType);
     }
 
     @Override

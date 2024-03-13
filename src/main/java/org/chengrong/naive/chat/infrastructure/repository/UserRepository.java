@@ -1,15 +1,11 @@
 package org.chengrong.naive.chat.infrastructure.repository;
 
 import com.alibaba.fastjson2.JSON;
-import org.chengrong.naive.chat.domain.user.model.LuckUserInfo;
-import org.chengrong.naive.chat.domain.user.model.UserInfo;
+import org.chengrong.naive.chat.domain.user.model.*;
 import org.chengrong.naive.chat.domain.user.repository.IUserRepository;
-import org.chengrong.naive.chat.infrastructure.dao.ITalkBoxDao;
-import org.chengrong.naive.chat.infrastructure.dao.IUserDao;
-import org.chengrong.naive.chat.infrastructure.dao.IUserFriendDao;
-import org.chengrong.naive.chat.infrastructure.po.TalkBox;
-import org.chengrong.naive.chat.infrastructure.po.User;
-import org.chengrong.naive.chat.infrastructure.po.UserFriend;
+import org.chengrong.naive.chat.infrastructure.common.Constants;
+import org.chengrong.naive.chat.infrastructure.dao.*;
+import org.chengrong.naive.chat.infrastructure.po.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -19,15 +15,19 @@ import java.util.List;
 
 @Repository("userRepository")
 public class UserRepository implements IUserRepository {
-
     @Autowired
     private IUserDao userDao;
-
     @Autowired
     private IUserFriendDao userFriendDao;
-
     @Autowired
     private ITalkBoxDao talkBoxDao;
+    @Autowired
+    private IUserGroupDao userGroupDao;
+    @Autowired
+    private IGroupsDao groupsDao;
+    @Autowired
+    private IChatRecordDao chatRecordDao;
+
     @Override
     public String queryUserPassword(String userId) {
         return userDao.queryUserPassword(userId);
@@ -43,7 +43,6 @@ public class UserRepository implements IUserRepository {
     public List<LuckUserInfo> queryFuzzyUserInfoList(String userId, String searchKey) {
         List<LuckUserInfo> luckUserInfoList = new ArrayList<>();
         List<User> userList = userDao.queryFuzzyUserList(userId, searchKey);
-        System.out.println("真正的查询结果：" + JSON.toJSONString(userList));
         for (User user : userList) {
             LuckUserInfo userInfo = new LuckUserInfo(user.getUserId(), user.getUserNickName(), user.getUserHead(), 0);
             // 查询是不是已经是好友了
@@ -89,6 +88,81 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public List<String> queryUserGroupsIdList(String userId) {
+        return userGroupDao.queryUserGroupsIdList(userId);
+    }
 
+    @Override
+    public List<TalkBoxInfo> queryTalkBoxInfoList(String userId) {
+        List<TalkBoxInfo> talkBoxInfoList = new ArrayList<>();
+        List<TalkBox> talkBoxList = talkBoxDao.queryTalkBoxList(userId);
+        for (TalkBox talkBox : talkBoxList) {
+            TalkBoxInfo talkBoxInfo = new TalkBoxInfo();
+            if (Constants.TalkType.Friend.getCode().equals(talkBox.getTalkType())) {
+                User user = userDao.queryUserById(talkBox.getTalkId());
+                talkBoxInfo.setTalkType(Constants.TalkType.Friend.getCode());
+                talkBoxInfo.setTalkId(user.getUserId());
+                talkBoxInfo.setTalkName(user.getUserNickName());
+                talkBoxInfo.setTalkHead(user.getUserHead());
+            } else if (Constants.TalkType.Group.getCode().equals(talkBox.getTalkType())) {
+                Groups groups = groupsDao.queryGroupsById(talkBox.getTalkId());
+                talkBoxInfo.setTalkType(Constants.TalkType.Group.getCode());
+                talkBoxInfo.setTalkId(groups.getGroupId());
+                talkBoxInfo.setTalkName(groups.getGroupName());
+                talkBoxInfo.setTalkHead(groups.getGroupHead());
+            }
+            talkBoxInfoList.add(talkBoxInfo);
+        }
+        return talkBoxInfoList;
+    }
+
+    @Override
+    public List<ChatRecordInfo> queryChatRecordInfoList(String talkId, String userId, Integer talkType) {
+        List<ChatRecordInfo> chatRecordInfoList = new ArrayList<>();
+        List<ChatRecord> list = new ArrayList<>();
+        if (Constants.TalkType.Friend.getCode().equals(talkType)) {
+            list = chatRecordDao.queryUserChatRecordList(talkId, userId);
+        } else if (Constants.TalkType.Group.getCode().equals(talkType)) {
+            list = chatRecordDao.queryGroupsChatRecordList(talkId, userId);
+        }
+        for (ChatRecord chatRecord : list) {
+            ChatRecordInfo chatRecordInfo = new ChatRecordInfo();
+            chatRecordInfo.setUserId(chatRecord.getUserId());
+            chatRecordInfo.setFriendId(chatRecord.getFriendId());
+            chatRecordInfo.setMsgContent(chatRecord.getMsgContent());
+            chatRecordInfo.setMsgType(chatRecord.getMsgType());
+            chatRecordInfo.setMsgDate(chatRecord.getMsgDate());
+            chatRecordInfoList.add(chatRecordInfo);
+        }
+        return chatRecordInfoList;
+    }
+
+    @Override
+    public List<GroupsInfo> queryUserGroupInfoList(String userId) {
+        List<GroupsInfo> groupsInfoList = new ArrayList<>();
+        List<String> groupsIdList = userGroupDao.queryUserGroupsIdList(userId);
+        for (String groupsId : groupsIdList) {
+            Groups groups = groupsDao.queryGroupsById(groupsId);
+            GroupsInfo groupsInfo = new GroupsInfo();
+            groupsInfo.setGroupId(groups.getGroupId());
+            groupsInfo.setGroupName(groups.getGroupName());
+            groupsInfo.setGroupHead(groups.getGroupHead());
+            groupsInfoList.add(groupsInfo);
+        }
+        return groupsInfoList;
+    }
+
+    @Override
+    public List<UserFriendInfo> queryUserFriendInfoList(String userId) {
+        List<UserFriendInfo> userFriendInfoList = new ArrayList<>();
+        List<String> friendIdList = userFriendDao.queryUserFriendIdList(userId);
+        for (String friendId : friendIdList) {
+            User user = userDao.queryUserById(friendId);
+            UserFriendInfo friendInfo = new UserFriendInfo();
+            friendInfo.setFriendId(user.getUserId());
+            friendInfo.setFriendName(user.getUserNickName());
+            friendInfo.setFriendHead(user.getUserHead());
+            userFriendInfoList.add(friendInfo);
+        }
+        return userFriendInfoList;
     }
 }

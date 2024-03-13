@@ -1,7 +1,6 @@
 package org.chengrong.naive.chat.domain.user.repository;
 
-import org.chengrong.naive.chat.domain.user.model.LuckUserInfo;
-import org.chengrong.naive.chat.domain.user.model.UserInfo;
+import org.chengrong.naive.chat.domain.user.model.*;
 import org.chengrong.naive.chat.infrastructure.po.UserFriend;
 
 import java.util.List;
@@ -57,4 +56,38 @@ public interface IUserRepository {
      * @return 用户群组ID集合
      */
     List<String> queryUserGroupsIdList(String userId);
+
+    /**
+     * 查询个人用户对话框列表
+     *
+     * @param userId 个人用户ID
+     * @return 对话框列表
+     */
+    List<TalkBoxInfo> queryTalkBoxInfoList(String userId);
+
+    /**
+     * 查询聊天记录
+     *
+     * @param talkId 对话框ID
+     * @param userId 好友ID
+     * @param talkType 对话框类型 0好友 1群组
+     * @return 聊天记录10条
+     */
+    List<ChatRecordInfo> queryChatRecordInfoList(String talkId, String userId, Integer talkType);
+
+    /**
+     * 查询个人用户群组列表
+     *
+     * @param userId 个人用户ID
+     * @return 群组列表
+     */
+    List<GroupsInfo> queryUserGroupInfoList(String userId);
+
+    /**
+     * 查询个人用户好友列表
+     *
+     * @param userId 个人用户ID
+     * @return 好友列表
+     */
+    List<UserFriendInfo> queryUserFriendInfoList(String userId);
 }

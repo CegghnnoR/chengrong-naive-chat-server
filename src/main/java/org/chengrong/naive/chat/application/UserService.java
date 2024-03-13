@@ -54,7 +54,7 @@ public interface UserService {
      * @param userId 个人用户ID
      * @return 好友列表
      */
-    List<GroupsInfo> queryUserGroupsInfoList(String userId);
+    List<GroupsInfo> queryUserGroupInfoList(String userId);
 
     /**
      * 模糊查询用户
