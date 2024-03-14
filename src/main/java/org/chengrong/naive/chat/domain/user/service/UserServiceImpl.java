@@ -5,15 +5,17 @@ import org.chengrong.naive.chat.application.UserService;
 import org.chengrong.naive.chat.domain.user.model.*;
 import org.chengrong.naive.chat.domain.user.repository.IUserRepository;
 import org.chengrong.naive.chat.infrastructure.po.UserFriend;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
-
     @Resource
     private IUserRepository userRepository;
+    @Resource
+    private ThreadPoolTaskExecutor taskExecutor;
     @Override
     public boolean checkAuth(String userId, String userPassword) {
         // 简单比对验证
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void asyncAppendChatRecord(ChatRecordInfo chatRecordInfo) {
-
+        taskExecutor.execute(() -> userRepository.appendChatRecord(chatRecordInfo));
     }
 
     @Override

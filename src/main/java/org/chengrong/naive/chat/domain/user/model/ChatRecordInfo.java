@@ -15,6 +15,13 @@ public class ChatRecordInfo {
     public ChatRecordInfo() {
     }
 
+    public ChatRecordInfo(String userId, String friendId, String msgContent, Date msgDate) {
+        this.userId = userId;
+        this.friendId = friendId;
+        this.msgContent = msgContent;
+        this.msgDate = msgDate;
+    }
+
     public ChatRecordInfo(String userId, String friendId, String msgContent, Integer msgType, Date msgDate) {
         this.userId = userId;
         this.friendId = friendId;

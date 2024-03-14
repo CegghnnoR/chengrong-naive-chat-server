@@ -90,4 +90,11 @@ public interface IUserRepository {
      * @return 好友列表
      */
     List<UserFriendInfo> queryUserFriendInfoList(String userId);
+
+    /**
+     * 添加聊天记录
+     *
+     * @param chatRecordInfo 聊天记录信息
+     */
+    void appendChatRecord(ChatRecordInfo chatRecordInfo);
 }
