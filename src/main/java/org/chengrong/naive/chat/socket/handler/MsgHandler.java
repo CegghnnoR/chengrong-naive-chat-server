@@ -21,7 +21,8 @@ public class MsgHandler extends MyBizHandler<MsgRequest> {
         // 异步写库
         userService.asyncAppendChatRecord(new ChatRecordInfo(msg.getUserId(),
                 msg.getFriendId(),
-                msg.getMsgText(), msg.getMsgDate()));
+                msg.getMsgText(), msg.getMsgType(), msg.getMsgDate(),
+                Constants.TalkType.Friend.getCode()));
         // 添加对话框【如果对方没有你的对话框则添加】
         userService.addTalkBoxInfo(msg.getFriendId(), msg.getUserId(),
                 Constants.TalkType.Friend.getCode());
